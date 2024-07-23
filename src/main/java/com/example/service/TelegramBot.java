@@ -1,6 +1,5 @@
 package com.example.service;
 
-import com.example.config.BotConfig;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -10,61 +9,55 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 @Component
 public class TelegramBot extends TelegramLongPollingBot {
-    final BotConfig botConfig;
-
-    public TelegramBot(BotConfig botConfig) {
-        this.botConfig = botConfig;
-    }
-
     @Override
     public String getBotToken() {
-        return botConfig.getToken();
+        return "6517497852:AAF0Yl1ISompZm4SqdCEPAnQUAzBkdHhi6w";
     }
 
     @Override
     public String getBotUsername() {
-        return getBotUsername();
+        return "javacssbot";
     }
+
 
     @Override
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
-            Message message = update.getMessage();
-            Long chatId = message.getChatId();
-
-
-            switch (message.getText()) {
-                case "/start":
+            String messageText = update.getMessage().getText();
+            long chatId = update.getMessage().getChat().getId();
+            switch (messageText) {
+                case "/start" -> {
                     try {
-                        startCommandReceived(chatId, message);
+                        sendCommandReceived(chatId, update.getMessage());
                     } catch (TelegramApiException e) {
                         throw new RuntimeException(e);
                     }
-                    break;
-                default:
+                }
+                default -> {
                     try {
-                        sendMessage(chatId, "Kechirasiz siz buyuruqni hato kiritingiz!!");
+                        sendMessage(chatId, "Mavjud bo'lmagan komadani kiritingiz!");
                     } catch (TelegramApiException e) {
                         throw new RuntimeException(e);
                     }
-
-
+                }
             }
         }
+
     }
 
-    private void startCommandReceived(Long chatId, Message message) throws TelegramApiException {
+    private void sendCommandReceived(long chatId, Message message) throws TelegramApiException {
 
-        String answer = "Salom " + message.getChat().getFirstName() + " hush kelibsiz";
-        sendMessage(chatId, answer);
+        String text = "Salom " + message.getChat().getFirstName() + " botimizga hush kelibsiz!";
+        sendMessage(chatId, text);
     }
 
 
-    private void sendMessage(Long chatId, String sendToMessage) throws TelegramApiException {
+    private void sendMessage(long chatId, String text) throws TelegramApiException {
         SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(chatId.toString());
-        sendMessage.setText(sendToMessage);
+        sendMessage.setText(text);
+        sendMessage.setChatId(chatId);
         execute(sendMessage);
+
     }
 
 
